@@ -20,7 +20,7 @@ namespace MagicaVoxelRead
                 throw new Exception("z can't be less than 0");
             X = _x;
             Y = _y;
-            z = _z;
+            Z = _z;
         }
     }
 }
