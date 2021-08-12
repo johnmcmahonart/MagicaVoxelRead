@@ -6,14 +6,12 @@ namespace MagicaVoxelRead
 {
     public class VoxelVariantBlueprint : ITileBlueprint
     {
-        private Dictionary <VoxelPosition, int> _voxelData;
-        public VoxelVariantBlueprint(List<IVoxel> _voxels, VoxelPosition _extents)
+        private VoxelType[,,] _voxelData;
+        
+        public VoxelVariantBlueprint(VoxelType[,,] _voxels, VoxelPosition _extents)
         {
             Extents = _extents;
-            foreach (var item in _voxels )
-            {
-                _voxelData.Add(item.Position, item.Vid);
-            }
+            _voxelData = _voxels;
         }
 
         public VoxelPosition Extents { get; }
@@ -23,17 +21,9 @@ namespace MagicaVoxelRead
             throw new NotImplementedException();
         }
 
-        public int GetVoxel(VoxelPosition _position)
+        public VoxelType GetVoxel(VoxelPosition _position)
         {
-            try
-            {
-                int foundVoxel = _voxelData[_position];
-                return foundVoxel;
-            }
-            catch
-            {
-                return -1; //used to indicate voxel is empty aka air
-            }
+            return _voxelData[_position.X, _position.Y, _position.Z];
             
         }
     }

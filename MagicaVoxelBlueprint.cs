@@ -1,6 +1,5 @@
 ﻿using Kaitai;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace MagicaVoxelRead
@@ -9,113 +8,22 @@ namespace MagicaVoxelRead
     {
         private MagicavoxelVox _voxelFromDisk;
         private string _filepath;
-        private Dictionary<VoxelPosition, int> _voxels;
+        private VoxelType[,,] _voxels;
         public VoxelPosition Extents { get; }
 
-        public List<IVoxel> GetEdge(Direction edge)
+        public VoxelType GetVoxel(VoxelPosition position)
         {
-            List<IVoxel> edgeData = new List<IVoxel>();
-            switch (edge)
-            {
-                case Direction.North:
-                    for (int i = 0; i < Extents.X+1; i++)
-                    {
-                        VoxelPosition position = new VoxelPosition(i, 0, 0);
-                        try
-                        {
-                            int id = GetVoxel(position);
-                            edgeData.Add(new Voxel(position, id));
-                        }
-                        catch 
-                        {
-
-                            
-                        }
-                    } 
-                        
-                    
-                    
-                    break;
-                case Direction.South:
-                    for (int i = 0; i < Extents.X + 1; i++)
-                    {
-                        VoxelPosition position = new VoxelPosition(i, Extents.Y, 0);
-                        try
-                        {
-                            int id = GetVoxel(position);
-                            edgeData.Add(new Voxel(position, id));
-                        }
-                        catch
-                        {
-
-
-                        }
-                    }
-                    break;
-                case Direction.East:
-                    for (int i = 0; i < Extents.Y + 1; i++)
-                    {
-                        VoxelPosition position = new VoxelPosition(Extents.X, i, 0);
-                        try
-                        {
-                            int id = GetVoxel(position);
-                            edgeData.Add(new Voxel(position, id));
-                        }
-                        catch
-                        {
-
-
-                        }
-                    }
-                    break;
-                case Direction.West:
-                    for (int i = 0; i < Extents.Y + 1; i++)
-                    {
-                        VoxelPosition position = new VoxelPosition(0, i, 0);
-                        try
-                        {
-                            int id = GetVoxel(position);
-                            edgeData.Add(new Voxel(position, id));
-                        }
-                        catch
-                        {
-
-
-                        }
-                    }
-                    break;
-                case Direction.Top:
-                    break;
-                case Direction.Bottom:
-                    break;
-                default:
-                    break;
-            }
-            return edgeData;
-        }
-
-        public int GetVoxel(VoxelPosition position)
-        {
-            try
-            {
-                int foundVoxel = _voxels[position];
-                return foundVoxel;
-            }
-            catch 
-            {
-                return -1;
-            
-            }
+            return _voxels[position.X, position.Y, position.Z];
         }
 
         public ITileBlueprint BuildVariant(Direction _direction)
         //build rotational variant by performing matrix rotation
         //only works if X and Y are equal
-        
+
         //todo
         //support other matrix rotations, right now this only works for +90
         {
-            List<IVoxel> voxels = new List<IVoxel>();
+            VoxelType[,,] voxels = new VoxelType[Extents.X, Extents.Y, Extents.Z];
             int size = Extents.X;
             int numLayers = (int)MathF.Round((size / 2), 0);
 
@@ -131,46 +39,20 @@ namespace MagicaVoxelRead
                     {
                         int offset = v - first;
                         VoxelPosition topPosition = new VoxelPosition(first, v, iz);
-                        try
-                        {
-                            int topID = _voxels[topPosition];
-                            voxels.Add(new Voxel(topPosition, topID));
-                        }
-                        catch
-                        {
-                            //int topID = -1;
-                            //if the dictionary doesn't contain the position it means the location in the voxel is empty aka air
-                            //we also don't need to add it to the blueprint
-                        }
+                        VoxelType topType = _voxels[topPosition.X, topPosition.Y, topPosition.Y];
+                        voxels[topPosition.X, topPosition.Y, topPosition.Z] = topType;
 
                         VoxelPosition rightPosition = new VoxelPosition(v, last, iz);
-                        try
-                        {
-                            int rightID = _voxels[rightPosition];
-                            voxels.Add(new Voxel(rightPosition, rightID));
-                        }
-                        catch
-                        {
-                            //do nothing
-                        }
+                        VoxelType rightType = _voxels[rightPosition.X, rightPosition.Y, rightPosition.Z];
+                        voxels[rightPosition.X, rightPosition.Y, rightPosition.Z] = rightType;
+
                         VoxelPosition bottomPosition = new VoxelPosition(last, last - offset, iz);
-                        try
-                        {
-                            int bottomID = _voxels[bottomPosition];
-                            voxels.Add(new Voxel(bottomPosition, bottomID));
-                        }
-                        catch
-                        {
-                        }
+                        VoxelType bottomType = _voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z];
+                        voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z] = bottomType;
+
                         VoxelPosition leftPosition = new VoxelPosition(last - offset, first, iz);
-                        try
-                        {
-                            int leftID = _voxels[leftPosition];
-                            voxels.Add(new Voxel(leftPosition, leftID));
-                        }
-                        catch
-                        {
-                        }
+                        VoxelType leftType = _voxels[leftPosition.X, leftPosition.Y, leftPosition.Z];
+                        voxels[leftPosition.X, leftPosition.Y, leftPosition.Z] = leftType;
                     }
                 }
             }
@@ -180,13 +62,29 @@ namespace MagicaVoxelRead
         //fill with voxel data
         public void Fill()
         {
+            _voxels = new VoxelType[Extents.X, Extents.Y, Extents.Z];
             //the first item in the main.childrenchunks that is of type Xyzi contains the actual voxel data
             MagicavoxelVox.Xyzi voxData = (MagicavoxelVox.Xyzi)_voxelFromDisk.Main.ChildrenChunks.First(item => item.ChunkId == Kaitai.MagicavoxelVox.ChunkType.Xyzi).ChunkContent;
 
-            foreach (var voxel in voxData.Voxels)
+            //magicavoxel voxel data is an unordered list, which only contains voxels that aren't empty
+            //first init array to air, then fill cells with info from voxel file
+
+            for (int z = 0; z < Extents.Z + 1; z++)
             {
-                VoxelPosition position = new VoxelPosition(voxel.X, voxel.Y, voxel.Z);
-                _voxels.Add(position, voxel.ColorIndex);
+                for (int x = 0; x < Extents.X + 1; x++)
+                {
+                    for (int y = 0; y < Extents.Y + 1; y++)
+                    {
+                        _voxels[x, y, z] = VoxelType.Air;
+                    }
+                }
+            }
+
+            //fill non empty cells
+            foreach (var item in voxData.Voxels)
+            {
+                //todo convert magicavoxel color index to appropriate voxel type
+                _voxels[item.X, item.Y, item.Z] = VoxelType.Grass;
             }
         }
 

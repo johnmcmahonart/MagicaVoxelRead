@@ -4,10 +4,10 @@ namespace MagicaVoxelRead
 {
     public interface ITileBlueprint
     {
-        public int GetVoxel(VoxelPosition position);
+        public VoxelType GetVoxel(VoxelPosition position);
 
         public VoxelPosition Extents { get; }
 
-        public List<IVoxel> GetEdge(Direction edge);
+        
     }
 }
