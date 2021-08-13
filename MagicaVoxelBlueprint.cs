@@ -8,10 +8,10 @@ namespace MagicaVoxelRead
     {
         private MagicavoxelVox _voxelFromDisk;
         private string _filepath;
-        private VoxelType[,,] _voxels;
+        private int[,,] _voxels;
         public VoxelPosition Extents { get; }
 
-        public VoxelType GetVoxel(VoxelPosition position)
+        public int GetVoxData(VoxelPosition position)
         {
             return _voxels[position.X, position.Y, position.Z];
         }
@@ -23,7 +23,7 @@ namespace MagicaVoxelRead
         //todo
         //support other matrix rotations, right now this only works for +90
         {
-            VoxelType[,,] voxels = new VoxelType[Extents.X, Extents.Y, Extents.Z];
+            int[,,] voxels = new int[Extents.X, Extents.Y, Extents.Z];
             int size = Extents.X;
             int numLayers = (int)MathF.Round((size / 2), 0);
 
@@ -39,20 +39,20 @@ namespace MagicaVoxelRead
                     {
                         int offset = v - first;
                         VoxelPosition topPosition = new VoxelPosition(first, v, iz);
-                        VoxelType topType = _voxels[topPosition.X, topPosition.Y, topPosition.Y];
-                        voxels[topPosition.X, topPosition.Y, topPosition.Z] = topType;
+                        int topData = _voxels[topPosition.X, topPosition.Y, topPosition.Y];
+                        voxels[topPosition.X, topPosition.Y, topPosition.Z] = topData;
 
                         VoxelPosition rightPosition = new VoxelPosition(v, last, iz);
-                        VoxelType rightType = _voxels[rightPosition.X, rightPosition.Y, rightPosition.Z];
-                        voxels[rightPosition.X, rightPosition.Y, rightPosition.Z] = rightType;
+                        int rightData = _voxels[rightPosition.X, rightPosition.Y, rightPosition.Z];
+                        voxels[rightPosition.X, rightPosition.Y, rightPosition.Z] = rightData;
 
                         VoxelPosition bottomPosition = new VoxelPosition(last, last - offset, iz);
-                        VoxelType bottomType = _voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z];
-                        voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z] = bottomType;
+                        int bottomData = _voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z];
+                        voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z] = bottomData;
 
                         VoxelPosition leftPosition = new VoxelPosition(last - offset, first, iz);
-                        VoxelType leftType = _voxels[leftPosition.X, leftPosition.Y, leftPosition.Z];
-                        voxels[leftPosition.X, leftPosition.Y, leftPosition.Z] = leftType;
+                        int leftData = _voxels[leftPosition.X, leftPosition.Y, leftPosition.Z];
+                        voxels[leftPosition.X, leftPosition.Y, leftPosition.Z] = leftData;
                     }
                 }
             }
@@ -60,9 +60,9 @@ namespace MagicaVoxelRead
         }
 
         //fill with voxel data
-        public void Fill()
+        public void Load()
         {
-            _voxels = new VoxelType[Extents.X, Extents.Y, Extents.Z];
+            _voxels = new int[Extents.X, Extents.Y, Extents.Z];
             //the first item in the main.childrenchunks that is of type Xyzi contains the actual voxel data
             MagicavoxelVox.Xyzi voxData = (MagicavoxelVox.Xyzi)_voxelFromDisk.Main.ChildrenChunks.First(item => item.ChunkId == Kaitai.MagicavoxelVox.ChunkType.Xyzi).ChunkContent;
 
@@ -75,7 +75,7 @@ namespace MagicaVoxelRead
                 {
                     for (int y = 0; y < Extents.Y + 1; y++)
                     {
-                        _voxels[x, y, z] = VoxelType.Air;
+                        _voxels[x, y, z] = -1;
                     }
                 }
             }
@@ -83,8 +83,7 @@ namespace MagicaVoxelRead
             //fill non empty cells
             foreach (var item in voxData.Voxels)
             {
-                //todo convert magicavoxel color index to appropriate voxel type
-                _voxels[item.X, item.Y, item.Z] = VoxelType.Grass;
+                _voxels[item.X, item.Y, item.Z] = item.ColorIndex;
             }
         }
 

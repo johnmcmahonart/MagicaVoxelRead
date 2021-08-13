@@ -8,7 +8,7 @@ namespace MagicaVoxelRead
         public static List<IVoxel> BuildEdge(Direction _edge, ITileBlueprint _voxelData)
         {
             VoxelPosition position;
-            VoxelType type;
+            int data;
             List<IVoxel> edgeData = new List<IVoxel>();
             switch (_edge)
             {
@@ -16,8 +16,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.X + 1; i++)
                     {
                         position = new VoxelPosition(i, 0, 0);
-                        type = _voxelData.GetVoxel(position);
-                        edgeData.Add(new Voxel(position, type));
+                        data = _voxelData.GetVoxData(position);
+                        edgeData.Add(new Voxel(position, data));
                     }
 
 
@@ -28,8 +28,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.X + 1; i++)
                     {
                         position = new VoxelPosition(i, _voxelData.Extents.Y, 0);
-                        type = _voxelData.GetVoxel(position);
-                        edgeData.Add(new Voxel(position, type));
+                        data = _voxelData.GetVoxData(position);
+                        edgeData.Add(new Voxel(position, data));
 
                     }
                     break;
@@ -37,8 +37,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.Y + 1; i++)
                     {
                         position = new VoxelPosition(_voxelData.Extents.X, i, 0);
-                        type = _voxelData.GetVoxel(position);
-                        edgeData.Add(new Voxel(position, type));
+                        data = _voxelData.GetVoxData(position);
+                        edgeData.Add(new Voxel(position, data));
 
                     }
                     break;
@@ -46,8 +46,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.Y + 1; i++)
                     {
                         position = new VoxelPosition(0, i, 0);
-                        type = _voxelData.GetVoxel(position);
-                        edgeData.Add(new Voxel(position, type));
+                        data = _voxelData.GetVoxData(position);
+                        edgeData.Add(new Voxel(position, data));
                     }
                     break;
                 case Direction.Top:

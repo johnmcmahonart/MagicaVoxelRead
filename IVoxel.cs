@@ -2,8 +2,8 @@
 {
     public interface IVoxel
     {
-        //visual ID = color index or enum int
-        public VoxelType Type { get; }
+        //visual ID = color index or -1 for empty
+        public int Data { get; }
 
         public VoxelPosition Position { get; }
     }

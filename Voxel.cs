@@ -2,14 +2,14 @@
 {
     public class Voxel : IVoxel
     {
-        public VoxelType Type { get; }
+        public int Data { get; }
         public VoxelPosition Position { get; }
 
-        public Voxel(VoxelPosition _position,VoxelType _type)
+        public Voxel(VoxelPosition _position,int _data)
 
         {
             Position = _position;
-            Type = _type;
+            Data = _data;
         }
     }
 }
