@@ -13,7 +13,7 @@ namespace MagicaVoxelRead
             switch (_edge)
             {
                 case Direction.North:
-                    for (int i = 0; i < _voxelData.Extents.X + 1; i++)
+                    for (int i = 0; i < _voxelData.Extents.X; i++)
                     {
                         position = new VoxelPosition(i, 0, 0);
                         data = _voxelData.GetVoxData(position);
@@ -25,7 +25,7 @@ namespace MagicaVoxelRead
 
                     break;
                 case Direction.South:
-                    for (int i = 0; i < _voxelData.Extents.X + 1; i++)
+                    for (int i = 0; i < _voxelData.Extents.X; i++)
                     {
                         position = new VoxelPosition(i, _voxelData.Extents.Y, 0);
                         data = _voxelData.GetVoxData(position);
@@ -34,7 +34,7 @@ namespace MagicaVoxelRead
                     }
                     break;
                 case Direction.East:
-                    for (int i = 0; i < _voxelData.Extents.Y + 1; i++)
+                    for (int i = 0; i < _voxelData.Extents.Y; i++)
                     {
                         position = new VoxelPosition(_voxelData.Extents.X, i, 0);
                         data = _voxelData.GetVoxData(position);
@@ -43,7 +43,7 @@ namespace MagicaVoxelRead
                     }
                     break;
                 case Direction.West:
-                    for (int i = 0; i < _voxelData.Extents.Y + 1; i++)
+                    for (int i = 0; i < _voxelData.Extents.Y; i++)
                     {
                         position = new VoxelPosition(0, i, 0);
                         data = _voxelData.GetVoxData(position);

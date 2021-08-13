@@ -28,7 +28,7 @@ namespace MagicaVoxelRead
             int numLayers = (int)MathF.Round((size / 2), 0);
 
             //loop through each z layer and rotate each layer in 2d
-            for (int iz = 0; iz < Extents.Z + 1; iz++)
+            for (int iz = 0; iz < Extents.Z; iz++)
             {
                 for (int iLayer = 0; iLayer < numLayers; iLayer++)
                 {
@@ -69,11 +69,11 @@ namespace MagicaVoxelRead
             //magicavoxel voxel data is an unordered list, which only contains voxels that aren't empty
             //first init array to air, then fill cells with info from voxel file
 
-            for (int z = 0; z < Extents.Z + 1; z++)
+            for (int z = 0; z < Extents.Z; z++)
             {
-                for (int x = 0; x < Extents.X + 1; x++)
+                for (int x = 0; x < Extents.X; x++)
                 {
-                    for (int y = 0; y < Extents.Y + 1; y++)
+                    for (int y = 0; y < Extents.Y; y++)
                     {
                         _voxels[x, y, z] = -1;
                     }
