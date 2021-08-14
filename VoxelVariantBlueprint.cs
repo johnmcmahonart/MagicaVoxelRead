@@ -6,12 +6,12 @@ namespace MagicaVoxelRead
 {
     public class VoxelVariantBlueprint : ITileBlueprint
     {
-        private int[,,] _voxelData;
+        private List<IVoxel> _voxels;
         
-        public VoxelVariantBlueprint(int[,,] _voxels, VoxelPosition _extents)
+        public VoxelVariantBlueprint(List<IVoxel> _voxels, VoxelPosition _extents)
         {
             Extents = _extents;
-            _voxelData = _voxels;
+            this._voxels = _voxels;
         }
 
         public VoxelPosition Extents { get; }
@@ -21,9 +21,10 @@ namespace MagicaVoxelRead
             throw new NotImplementedException();
         }
 
-        public int GetVoxData(VoxelPosition _position)
+        public IVoxel GetVoxel(VoxelPosition _position)
         {
-            return _voxelData[_position.X, _position.Y, _position.Z];
+            return _voxels[_position.Y + _voxels.Count * (_position.X + _voxels.Count * _position.Z)];
+
             
         }
     }

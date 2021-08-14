@@ -16,8 +16,7 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.X; i++)
                     {
                         position = new VoxelPosition(i, 0, 0);
-                        data = _voxelData.GetVoxData(position);
-                        edgeData.Add(new Voxel(position, data));
+                        MakeEdgeVoxel(_voxelData, position, edgeData, i);
                     }
 
 
@@ -28,8 +27,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.X; i++)
                     {
                         position = new VoxelPosition(i, _voxelData.Extents.Y, 0);
-                        data = _voxelData.GetVoxData(position);
-                        edgeData.Add(new Voxel(position, data));
+                        MakeEdgeVoxel(_voxelData, position, edgeData, i);
+                        
 
                     }
                     break;
@@ -37,8 +36,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.Y; i++)
                     {
                         position = new VoxelPosition(_voxelData.Extents.X, i, 0);
-                        data = _voxelData.GetVoxData(position);
-                        edgeData.Add(new Voxel(position, data));
+                        MakeEdgeVoxel(_voxelData, position, edgeData, i);
+                        
 
                     }
                     break;
@@ -46,8 +45,8 @@ namespace MagicaVoxelRead
                     for (int i = 0; i < _voxelData.Extents.Y; i++)
                     {
                         position = new VoxelPosition(0, i, 0);
-                        data = _voxelData.GetVoxData(position);
-                        edgeData.Add(new Voxel(position, data));
+                        MakeEdgeVoxel(_voxelData, position, edgeData, i);
+                        
                     }
                     break;
                 case Direction.Top:
@@ -59,6 +58,16 @@ namespace MagicaVoxelRead
             }
 
             return edgeData;
+
+            static void MakeEdgeVoxel(ITileBlueprint _voxelData, VoxelPosition position, List<IVoxel> edgeData, int i)
+            {
+                IVoxel voxel = _voxelData.GetVoxel(position);
+                edgeData.Add(new Voxel(position, voxel.Data));
+                if (voxel.IsSolid)
+                {
+                    edgeData[i].ToggleSolid();
+                }
+            }
         }
     }
 }

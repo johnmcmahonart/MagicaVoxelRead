@@ -1,30 +1,31 @@
 ﻿using Kaitai;
 using System;
 using System.Linq;
-
+using System.Collections.Generic;
 namespace MagicaVoxelRead
 {
     public class MagicaVoxelBlueprint : ITileBlueprint
     {
         private MagicavoxelVox _voxelFromDisk;
         private string _filepath;
-        private int[,,] _voxels;
+        private List<IVoxel> _voxels;
         public VoxelPosition Extents { get; }
 
-        public int GetVoxData(VoxelPosition position)
+        public IVoxel GetVoxel(VoxelPosition position)
         {
-            return _voxels[position.X, position.Y, position.Z];
+            return _voxels[position.Y + _voxels.Count * (position.X + _voxels.Count * position.Z)];
         }
 
         public ITileBlueprint BuildVariant(Direction _direction)
         //build rotational variant by performing matrix rotation
         //only works if X and Y are equal
-
+        // https://stackoverflow.com/questions/42519/how-do-you-rotate-a-two-dimensional-array
         //todo
         //support other matrix rotations, right now this only works for +90
         {
-            int[,,] voxels = new int[Extents.X, Extents.Y, Extents.Z];
+            
             int size = Extents.X;
+            IVoxel[] voxels = new IVoxel[size*size*size];
             int numLayers = (int)MathF.Round((size / 2), 0);
 
             //loop through each z layer and rotate each layer in 2d
@@ -39,35 +40,60 @@ namespace MagicaVoxelRead
                     {
                         int offset = v - first;
                         VoxelPosition topPosition = new VoxelPosition(first, v, iz);
-                        int topData = _voxels[topPosition.X, topPosition.Y, topPosition.Y];
-                        voxels[topPosition.X, topPosition.Y, topPosition.Z] = topData;
+                        int topIndex = topPosition.Y + _voxels.Count * (topPosition.X + _voxels.Count * topPosition.Z);
+                        
+                        int topData = _voxels[topIndex].Data;
+                        voxels[topIndex]=new Voxel(topPosition,topData);
+                        
+                        //new voxels start as empty, so we need to set it to solid if it is solid in the original
+                        if (_voxels[topIndex].IsSolid)
+                        {
+                            voxels[topIndex].ToggleSolid();
+                        }
 
                         VoxelPosition rightPosition = new VoxelPosition(v, last, iz);
-                        int rightData = _voxels[rightPosition.X, rightPosition.Y, rightPosition.Z];
-                        voxels[rightPosition.X, rightPosition.Y, rightPosition.Z] = rightData;
+                        int rightIndex = rightPosition.Y + _voxels.Count * (rightPosition.X + _voxels.Count * rightPosition.Z);
+                        int rightData = _voxels[rightIndex].Data;
+                        voxels[rightIndex] = new Voxel(rightPosition,rightData);
 
+                        if (_voxels[rightIndex].IsSolid)
+                        {
+                            voxels[rightIndex].ToggleSolid();
+                        }
                         VoxelPosition bottomPosition = new VoxelPosition(last, last - offset, iz);
-                        int bottomData = _voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z];
-                        voxels[bottomPosition.X, bottomPosition.Y, bottomPosition.Z] = bottomData;
+                        int bottomIndex = bottomPosition.Y + _voxels.Count * (bottomPosition.X + _voxels.Count * bottomPosition.Z);
+                        int bottomData = _voxels[bottomIndex].Data;
+                        voxels[bottomIndex] = new Voxel(bottomPosition,bottomData);
 
+                        if (_voxels[bottomIndex].IsSolid)
+                        {
+                            voxels[bottomIndex].ToggleSolid();
+                        }
                         VoxelPosition leftPosition = new VoxelPosition(last - offset, first, iz);
-                        int leftData = _voxels[leftPosition.X, leftPosition.Y, leftPosition.Z];
-                        voxels[leftPosition.X, leftPosition.Y, leftPosition.Z] = leftData;
+                        int leftIndex = leftPosition.Y + _voxels.Count * (leftPosition.X + _voxels.Count * leftPosition.Z);
+                        int leftData = _voxels[leftIndex].Data;
+                        voxels[leftIndex] = new Voxel(leftPosition,leftData);
+                        
+                        if (_voxels[leftIndex].IsSolid)
+                        {
+                            voxels[leftIndex].ToggleSolid();
+                        }
+
                     }
                 }
             }
-            return new VoxelVariantBlueprint(voxels, Extents);
+            return new VoxelVariantBlueprint(voxels.ToList(), Extents);
         }
 
         //fill with voxel data
         public void Load()
         {
-            _voxels = new int[Extents.X, Extents.Y, Extents.Z];
+            _voxels = new List<IVoxel>();
             //the first item in the main.childrenchunks that is of type Xyzi contains the actual voxel data
-            MagicavoxelVox.Xyzi voxData = (MagicavoxelVox.Xyzi)_voxelFromDisk.Main.ChildrenChunks.First(item => item.ChunkId == Kaitai.MagicavoxelVox.ChunkType.Xyzi).ChunkContent;
+            MagicavoxelVox.Xyzi voxMagicaData = (MagicavoxelVox.Xyzi)_voxelFromDisk.Main.ChildrenChunks.First(item => item.ChunkId == Kaitai.MagicavoxelVox.ChunkType.Xyzi).ChunkContent;
 
             //magicavoxel voxel data is an unordered list, which only contains voxels that aren't empty
-            //first init array to air, then fill cells with info from voxel file
+            //so we need to check if a voxel is assigned a colorindex and if it is, make it solid
 
             for (int z = 0; z < Extents.Z; z++)
             {
@@ -75,16 +101,20 @@ namespace MagicaVoxelRead
                 {
                     for (int y = 0; y < Extents.Y; y++)
                     {
-                        _voxels[x, y, z] = -1;
+                        int foundVoxel = (int)voxMagicaData.Voxels.First(item => item.X == x && item.Y == y && item.Z == z).ColorIndex;
+                        _voxels.Add(new Voxel(new VoxelPosition(x,y,z),foundVoxel));
+                        
+                        //if the found color index is over 0 the voxel exists, therefore it is solid
+                        if (foundVoxel>0)
+                        {
+                            _voxels[y + _voxels.Count * (x + _voxels.Count * z)].ToggleSolid();
+                        }
+                    
                     }
                 }
             }
 
-            //fill non empty cells
-            foreach (var item in voxData.Voxels)
-            {
-                _voxels[item.X, item.Y, item.Z] = item.ColorIndex;
-            }
+            
         }
 
         public MagicaVoxelBlueprint(string _path)
