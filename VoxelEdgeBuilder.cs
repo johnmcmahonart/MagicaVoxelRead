@@ -8,7 +8,6 @@ namespace MagicaVoxelRead
         public static List<IVoxel> BuildEdge(Direction _edge, ITileBlueprint _voxelData)
         {
             VoxelPosition position;
-            int data;
             List<IVoxel> edgeData = new List<IVoxel>();
             switch (_edge)
             {
