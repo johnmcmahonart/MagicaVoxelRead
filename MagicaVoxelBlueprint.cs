@@ -104,11 +104,6 @@ namespace MagicaVoxelRead
                         int foundVoxel = (int)voxMagicaData.Voxels.First(item => item.X == x && item.Y == y && item.Z == z).ColorIndex;
                         _voxels.Add(new Voxel(new VoxelPosition(x,y,z),foundVoxel));
                         
-                        //if the found color index is over 0 the voxel exists, therefore it is solid
-                        if (foundVoxel>0)
-                        {
-                            _voxels[y + _voxels.Count * (x + _voxels.Count * z)].ToggleSolid();
-                        }
                     
                     }
                 }
@@ -128,5 +123,18 @@ namespace MagicaVoxelRead
             //get maximum bounds of the tile in voxels
             Extents = new VoxelPosition(Convert.ToInt32(size.SizeX), Convert.ToInt32(size.SizeY), Convert.ToInt32(size.SizeZ));
         }
+        public void ZuptoY()
+        //converts Z up used in MagicaVoxel to Y up used in other engines like godot
+        
+        {
+            int i = 0;
+            foreach (var item in _voxels)
+            {
+                _voxels[i] = new Voxel( new VoxelPosition(item.Position.X, item.Position.Z, item.Position.Y),item.Data);
+                i++;
+            }
+        }
+    
+    
     }
 }

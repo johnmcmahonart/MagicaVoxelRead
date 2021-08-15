@@ -11,8 +11,12 @@
         {
             Position = _position;
             Data = _data;
+            if (Data>0)
+            {
+                _isSolid = true;
+            }
         }
-        public bool IsSolid { get; }
+        public bool IsSolid => _isSolid;
         public void ToggleSolid()
         {
             _isSolid = !_isSolid;
