@@ -92,9 +92,7 @@ namespace MagicaVoxelRead
             //the first item in the main.childrenchunks that is of type Xyzi contains the actual voxel data
             MagicavoxelVox.Xyzi voxMagicaData = (MagicavoxelVox.Xyzi)_voxelFromDisk.Main.ChildrenChunks.First(item => item.ChunkId == Kaitai.MagicavoxelVox.ChunkType.Xyzi).ChunkContent;
 
-            //magicavoxel voxel data is an unordered list, which only contains voxels that aren't empty
-            //so we need to check if a voxel is assigned a colorindex and if it is, make it solid
-
+            
             for (int z = 0; z < Extents.Z; z++)
             {
                 for (int x = 0; x < Extents.X; x++)
