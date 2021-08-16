@@ -4,9 +4,9 @@ namespace MagicaVoxelRead
 {
     public interface ITileBlueprint
     {
-        public IVoxel GetVoxel(VoxelPosition position);
+        IVoxel GetVoxel(VoxelPosition position);
 
-        public VoxelPosition Extents { get; }
+        VoxelPosition Extents  { get; }
 
         
     }

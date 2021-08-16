@@ -26,7 +26,7 @@ namespace MagicaVoxelRead
             
             int size = Extents.X;
             IVoxel[] voxels = new IVoxel[size*size*size];
-            int numLayers = (int)MathF.Round((size / 2), 0);
+            int numLayers = (int)Math.Round((size / 2.0F), 0);
 
             //loop through each z layer and rotate each layer in 2d
             for (int iz = 0; iz < Extents.Z; iz++)

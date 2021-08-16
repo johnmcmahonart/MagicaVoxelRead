@@ -58,15 +58,13 @@ namespace MagicaVoxelRead
 
             return edgeData;
 
-            static void MakeEdgeVoxel(ITileBlueprint _voxelData, VoxelPosition position, List<IVoxel> edgeData, int i)
-            {
-                IVoxel voxel = _voxelData.GetVoxel(position);
-                edgeData.Add(new Voxel(position, voxel.Data));
-                if (voxel.IsSolid)
-                {
-                    edgeData[i].ToggleSolid();
-                }
-            }
+            
+        }
+        public static List<IVoxel> MakeEdgeVoxel(ITileBlueprint _voxelData, VoxelPosition position, List<IVoxel> edgeData, int i)
+        {
+            IVoxel voxel = _voxelData.GetVoxel(position);
+            edgeData.Add(new Voxel(position, voxel.Data));
+            return edgeData;
         }
     }
 }
