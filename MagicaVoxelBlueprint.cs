@@ -18,7 +18,7 @@ namespace MagicaVoxelRead
 
         private int _getIndex(VoxelPosition position)
         {
-            return position.Y + Extents.Y * (position.X * position.Z+ Extents.X);
+            return (position.Y + (position.X * Extents.X)+(Extents.X*Extents.Y*position.Z));
         }
 
         //fill with voxel data
