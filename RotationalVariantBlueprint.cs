@@ -17,7 +17,7 @@ namespace MagicaVoxelRead
 
         private int _getIndex(VoxelPosition position)
         {
-            return position.Y + Extents.Y * (position.X * position.Z + Extents.X);
+            return (position.Y + (position.X * Extents.X) + (Extents.X * Extents.Y * position.Z));
         }
         private void  _rotateMatrix(Direction _direction)
         //build rotational variant by performing matrix rotation
