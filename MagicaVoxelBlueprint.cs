@@ -18,7 +18,7 @@ namespace MagicaVoxelRead
 
         private int _getIndex(VoxelPosition position)
         {
-            return (position.Y + (position.X * Extents.X)+(Extents.X*Extents.Y*position.Z));
+            return (position.Z + (position.X * Extents.X)+(Extents.X*Extents.Z*position.Y));
         }
 
         //fill with voxel data
@@ -50,8 +50,8 @@ namespace MagicaVoxelRead
                     }
                 }
             }
-
-            
+            //convert Z up to Y up coordinate space
+            _ZuptoY();            
         }
 
         public MagicaVoxelBlueprint(string _path)
@@ -65,19 +65,23 @@ namespace MagicaVoxelRead
             //get maximum bounds of the tile in voxels
             Extents = new VoxelPosition(Convert.ToInt32(size.SizeX), Convert.ToInt32(size.SizeY), Convert.ToInt32(size.SizeZ));
         }
-        public void ZuptoY()
+        private void _ZuptoY()
         //converts Z up used in MagicaVoxel to Y up used in other engines like godot
-        
+        //we need to swap the Y and Z position of the voxel, as well as change where in the list it is stored, so it matches _getindex
         {
-            List<IVoxel> tempList = new List<IVoxel>();
+            List<IVoxel> tempList = new List<IVoxel>(); ;
             
             foreach (var item in _voxels)
             {
-                
+
+
+                //VoxelPosition tpos = new VoxelPosition(item.Position.X, item.Position.Y, item.Position.Z);
+                //int tempIndex = _getIndex(tpos);
                 tempList.Add(new Voxel( new VoxelPosition(item.Position.X, item.Position.Z, item.Position.Y),item.Data));
                 
             }
-            _voxels = tempList;
+            this._voxels = tempList;
+            
         }
     
     
